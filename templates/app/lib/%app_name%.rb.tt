@@ -1,0 +1,3 @@
+module <%= constant_name %>
+  autoload :VERSION, "<%= app_name %>/version"
+end

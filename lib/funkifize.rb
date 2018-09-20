@@ -1,5 +1,7 @@
-require "funkifize/version"
+require "thor"
 
 module Funkifize
-  # Your code goes here...
+  autoload :VERSION, "funkifize/version"
+  autoload :CLI, "funkifize/cli"
+  autoload :App, "funkifize/app"
 end
