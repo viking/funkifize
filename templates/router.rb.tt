@@ -1,0 +1,29 @@
+module <%= app_constant %>
+  class <%= router_constant %> < Router
+    def initialize(controller)
+      @controller = controller
+    end
+
+    def self.dependencies
+      ['<%= resource_constant %>Controller']
+    end
+
+    def setup_action(req)
+      path = req.path_info
+      action = nil
+
+      case req.request_method
+      when 'GET'
+        # no-op
+      when 'POST'
+        # no-op
+      when 'PUT'
+        # no-op
+      when 'DELETE'
+        # no-op
+      end
+
+      action
+    end
+  end
+end

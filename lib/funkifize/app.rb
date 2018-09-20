@@ -16,7 +16,7 @@ module Funkifize
       end
 
       def setup
-        @constant_name = app_name.gsub(/([_-]+|^)(.)/) { $1.to_s + $2.upcase }
+        @constant_name = app_name.gsub(/(?:[_-]+|^)(.)/) { $2.upcase }
 
         git_author_name = `git config user.name`.chomp rescue ""
         @author = git_author_name.empty? ? "TODO: Write your name" : git_author_name
