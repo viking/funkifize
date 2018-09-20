@@ -1,3 +1,46 @@
+require "thor"
+require "rack"
+require "json"
+require "rack/cors"
+require "hashery"
+require "sequel"
+
 module <%= constant_name %>
   autoload :VERSION, "<%= app_name %>/version"
+
+  # base classes
+  autoload :Application, "<%= app_name %>/application"
+  autoload :Builder, "<%= app_name %>/builder"
+  autoload :CLI, "<%= app_name %>/cli"
+  autoload :Controller, "<%= app_name %>/controller"
+  autoload :Entity, "<%= app_name %>/entity"
+  autoload :Injector, "<%= app_name %>/injector"
+  autoload :Repository, "<%= app_name %>/repository"
+  autoload :Router, "<%= app_name %>/router"
+
+  # repository adapters
+  autoload :SequelAdapter, "<%= app_name %>/adapters/sequel_adapter"
+
+  # helper for creating entity classes
+  def self.Entity(attribute_names, &block)
+    klass = Class.new(Entity) do
+      @attribute_names = attribute_names
+
+      attribute_names.each do |attribute_name|
+        define_method(attribute_name) do
+          @attributes[attribute_name]
+        end
+
+        define_method("#{attribute_name}=") do |value|
+          @attributes[attribute_name] = value
+        end
+      end
+    end
+
+    if block
+      klass.module_eval(&block)
+    end
+
+    klass
+  end
 end

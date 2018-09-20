@@ -1,0 +1,55 @@
+module <%= constant_name %>
+  class Application
+    def initialize()
+      @routes = [
+        # { path: %r{^/widgets(?=/)?}, router: widget_router }
+      ]
+    end
+
+    def self.dependencies
+      []
+    end
+
+    def call(env)
+      req = Rack::Request.new(env)
+      res = Rack::Response.new()
+      path = req.path_info
+
+      if req.request_method == "OPTIONS"
+        res.status = 200
+        res.finish
+        return
+      end
+
+      router = nil
+      @routes.each do |route|
+        md = route[:path].match(path)
+        if !md.nil?
+          req.script_name += md[0]
+          req.path_info = md.post_match
+          router = route[:router]
+
+          break
+        end
+      end
+
+      if router
+        begin
+          router.route(req, res)
+        rescue Exception => e
+          p e
+          p e.backtrace
+          res["Content-Type"] = "application/json"
+          res.write(JSON.generate({ 'errors' => [e] }))
+          res.status = 500
+        end
+      else
+        res["Content-Type"] = "application/json"
+        res.write(JSON.generate({ 'errors' => [ 'not found' ] }))
+        res.status = 404
+      end
+
+      res.finish
+    end
+  end
+end

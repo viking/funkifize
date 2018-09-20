@@ -1,0 +1,43 @@
+module <%= constant_name %>
+  class Builder
+    attr_reader :injector, :options
+
+    def initialize(options)
+      # application options
+      @options = options.dup
+      @options["database_uri"] ||= 'sqlite:/' # in-memory database
+
+      # bootstrap dependency injector
+      @injector = Injector.new
+      bootstrap
+    end
+
+    def app
+      app = injector.get("Application")
+      Rack::Builder.new(app) do
+        use Rack::Cors do
+          allow do
+            origins 'localhost:4200'
+            resource '*', :methods => :any, :headers => :any
+          end
+        end
+        use Rack::CommonLogger
+      end
+    end
+
+    private
+
+    def bootstrap
+      # register injector values and factories
+      injector.register_factory('adapter', method(:create_adapter))
+      injector.register_service('Application', Application)
+    end
+
+    def create_adapter
+      # create adapter and auto-migrate
+      adapter = SequelAdapter.new(@options["database_uri"])
+      adapter.migrate(File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'db', 'migrate')))
+      adapter
+    end
+  end
+end
