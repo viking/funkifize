@@ -5,7 +5,7 @@ module <%= app_constant %>
     end
 
     def self.dependencies
-      ['<%= resource_constant %>Controller']
+      %w{<%= resource_constant %>Controller}
     end
 
     def setup_action(req)

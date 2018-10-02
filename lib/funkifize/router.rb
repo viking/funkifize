@@ -5,6 +5,7 @@ module Funkifize
       include Helpers
       attr_reader :resource_constant, :router_name, :router_constant
 
+      add_runtime_options!
       argument :resource_name, :desc => "Name of resource to make a router for"
 
       def self.source_root
@@ -17,19 +18,48 @@ module Funkifize
       end
 
       def setup
-        pushd(options[:chdir])
+        self.destination_root = options[:root] if options[:root]
+        @router_options = { verbose: !options[:quiet] }
         @resource_constant = make_constant_name(resource_name)
         @router_name = "#{resource_name}_router"
         @router_constant = make_constant_name(@router_name)
       end
 
       def create_router_file
-        empty_directory(File.join(app_name, 'lib', app_name, 'routers'))
-        template('router.rb', File.join(app_name, 'lib', app_name, 'routers', "#{router_name}.rb"))
+        empty_directory(File.join("lib", app_name, "routers"), @router_options)
+        template("router.rb", File.join("lib", app_name, "routers", "#{router_name}.rb"), @router_options)
       end
 
-      def teardown
-        popd
+      def add_autoload_instruction
+        inside do
+          target = File.join("lib", "#{app_name}.rb")
+
+          # put line either after a block starting with "# routers" or just
+          # before the end of the main app module
+          pattern = /^(\s*)module #{app_constant}.*\n(?:\s*# routers.*\n(?=\n)|(?=\1end\s*))/m
+          rplmnt = %{\1  autoload :#{router_constant}, "#{app_name}/routers/#{router_name}"\n}
+          inject_into_file(target, rplmnt, @router_options.merge(after: pattern))
+        end
+      end
+
+      def setup_injector
+        inside do
+          target = File.join("lib", app_name, "builder.rb")
+
+          # put line # just before the end of the bootstrap function
+          pattern = /^([ \t]*)def bootstrap.*?(?=^\1end\b)/m
+          rplmnt = %{\\1  injector.register_service('#{router_constant}', #{router_constant})\n}
+          inject_into_file(target, rplmnt, @router_options.merge(after: pattern))
+        end
+      end
+
+      def add_application_dependency
+        inside do
+          target = File.join("lib", app_name, "application.rb")
+          pattern = /^\s*def self.dependencies\n\s*%w{\s*(?:[^}\s]+\s+)*(?=})/m
+          rplmnt = %{#{router_constant} }
+          inject_into_file(target, rplmnt, @router_options.merge(after: pattern))
+        end
       end
     end
 

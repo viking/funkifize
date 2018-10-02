@@ -21,6 +21,20 @@ module <%= constant_name %>
   # repository adapters
   autoload :SequelAdapter, "<%= app_name %>/adapters/sequel_adapter"
 
+  # repositories
+
+  # actions
+
+  # routers
+
+  # controllers
+
+  # params
+
+  # validators
+
+  # entities
+
   # helper for creating entity classes
   def self.Entity(attribute_names, &block)
     klass = Class.new(Entity) do

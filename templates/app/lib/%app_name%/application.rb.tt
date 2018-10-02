@@ -7,7 +7,7 @@ module <%= constant_name %>
     end
 
     def self.dependencies
-      []
+      %w{}
     end
 
     def call(env)

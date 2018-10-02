@@ -1,39 +1,31 @@
 module Funkifize
   module Helpers
-    def pushd(dir = nil)
-      @dstack ||= []
-      @dstack << Dir.pwd
-      if dir
-        Dir.chdir(dir)
-      end
-    end
-
-    def popd
-      Dir.chdir(@dstack.pop)
-    end
-
     def make_constant_name(name)
       name.gsub(/(?:[_-]+|^)(.|$)/) { $1.upcase }
     end
 
     def app_name
       unless defined? @app_name
-        # look for gemspec file in current directory
-        files = Dir['*.gemspec']
-        if files.empty?
-          raise "Not inside a funkifized application (no gemspec)"
+        inside do
+          # look for gemspec file in current directory
+          files = Dir['*.gemspec']
+          if files.empty?
+            raise "Not inside a funkifized application (no gemspec)"
+          end
+
+          app_name = files[0][/^(.+?)(?=\.gemspec$)/]
+
+          # do some rudimentary tests to make sure code generation will succeed
+          if !File.exist?(File.join('lib', "#{app_name}.rb"))
+            raise "Not inside a funkifized application (no lib/#{app_name}.rb)"
+          elsif !File.exist?(File.join('lib', app_name, 'application.rb'))
+            raise "Not inside a funkifized application (no lib/#{app_name}/application.rb)"
+          elsif !File.exist?(File.join('lib', app_name, 'builder.rb'))
+            raise "Not inside a funkifized application (no lib/#{app_name}/builder.rb)"
+          end
+
+          @app_name = app_name
         end
-
-        app_name = files[0][/^(.+?)(?=\.gemspec$)/]
-
-        # do some rudimentary tests to make sure code generation will succeed
-        if !File.exist?(File.join('lib', app_name, 'application.rb'))
-          raise "Not inside a funkifized application (no lib/#{app_name}/application.rb)"
-        elsif !File.exist?(File.join('lib', app_name, 'builder.rb'))
-          raise "Not inside a funkifized application (no lib/#{app_name}/builder.rb)"
-        end
-
-        @app_name = app_name
       end
 
       @app_name

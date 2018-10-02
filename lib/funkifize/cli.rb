@@ -1,6 +1,6 @@
 module Funkifize
   class CLI < Thor
-    class_option :chdir, :type => :string
+    class_option :root, :type => :string
 
     desc "app SUBCOMMAND ...ARGS", "Manage applications"
     subcommand "app", App

@@ -4,6 +4,7 @@ module Funkifize
       include Thor::Actions
       attr_reader :constant_name, :author, :email, :github_username
 
+      add_runtime_options!
       argument :app_name, :desc => "Application name"
 
       def self.source_root
@@ -16,7 +17,8 @@ module Funkifize
       end
 
       def setup
-        @constant_name = app_name.gsub(/(?:[_-]+|^)(.)/) { $2.upcase }
+        @app_options = { verbose: !options[:quiet] }
+        @constant_name = app_name.gsub(/(?:[_-]+|^)(.)/) { $1.upcase }
 
         git_author_name = `git config user.name`.chomp rescue ""
         @author = git_author_name.empty? ? "TODO: Write your name" : git_author_name
@@ -28,7 +30,7 @@ module Funkifize
       end
 
       def create_directories
-        directory("app", app_name)
+        directory("app", app_name, @app_options)
       end
     end
 
