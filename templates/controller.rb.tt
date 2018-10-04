@@ -1,0 +1,10 @@
+module <%= app_constant %>
+  class <%= controller_constant %> < Controller
+    def initialize
+    end
+
+    def self.dependencies
+      %w{}
+    end
+  end
+end

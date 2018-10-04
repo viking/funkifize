@@ -7,5 +7,8 @@ module Funkifize
 
     desc "router SUBCOMMAND ...ARGS", "Manage routers"
     subcommand "router", Router
+
+    desc "controller SUBCOMMAND ...ARGS", "Manage controllers"
+    subcommand "controller", Controller
   end
 end

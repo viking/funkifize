@@ -5,5 +5,6 @@ module Funkifize
   autoload :CLI, "funkifize/cli"
   autoload :App, "funkifize/app"
   autoload :Router, "funkifize/router"
+  autoload :Controller, "funkifize/controller"
   autoload :Helpers, "funkifize/helpers"
 end
