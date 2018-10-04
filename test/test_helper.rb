@@ -7,7 +7,14 @@ require "minitest/autorun"
 module TestHelpers
   def assert_file_contains(filename, pattern)
     data = File.read(filename)
-    assert data.match?(pattern), "#{pattern.inspect} was not contained in #{filename}"
+    case pattern
+    when Regexp
+      assert data.match?(pattern), "#{pattern.inspect} was not contained in #{filename}"
+    when String
+      assert data.include?(pattern)
+    else
+      raise "pattern is not a regexp or a string"
+    end
   end
 
   def gsub_file(filename, pattern, replacement)

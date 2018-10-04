@@ -56,8 +56,22 @@ module Funkifize
       def add_application_dependency
         inside do
           target = File.join("lib", app_name, "application.rb")
-          pattern = /^\s*def self.dependencies\n\s*%w{\s*(?:[^}\s]+\s+)*(?=})/m
-          rplmnt = %{#{router_constant} }
+          add_class_dependency(target, "Application", router_name, router_constant)
+        end
+      end
+
+      def add_default_route
+        inside do
+          target = File.join("lib", app_name, "application.rb")
+
+          # put line # just before the end of the bootstrap function
+          pattern = %r{
+            ^([ \t]+)def\ initialize.*?\n
+            \1\ \ @routes\ =\ \[\n
+            (\1\ \ \ \ .*?\n)*
+            (?=\1\ \ \])
+          }xm
+          rplmnt = "\\1    { path: %r{^/#{resource_name}s(?=/)?}, router: #{router_name} },\n"
           inject_into_file(target, rplmnt, @router_options.merge(after: pattern))
         end
       end

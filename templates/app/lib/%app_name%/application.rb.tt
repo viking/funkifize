@@ -1,8 +1,9 @@
 module <%= constant_name %>
   class Application
-    def initialize()
+    def initialize
+      # Example route:
+      #   { path: %r{^/widgets(?=/)?}, router: widget_router }
       @routes = [
-        # { path: %r{^/widgets(?=/)?}, router: widget_router }
       ]
     end
 
