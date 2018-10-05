@@ -2,6 +2,7 @@ $LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
 require "funkifize"
 
 require "tmpdir"
+require "fileutils"
 require "minitest/autorun"
 
 module TestHelpers
@@ -21,5 +22,9 @@ module TestHelpers
     content = File.binread(filename)
     content.gsub!(pattern, replacement)
     File.open(filename, "wb") { |file| file.write(content) }
+  end
+
+  def touch_file(filename)
+    FileUtils.touch(filename)
   end
 end

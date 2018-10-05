@@ -1,0 +1,8 @@
+Sequel.migration do
+  up do
+    create_table(:<%= pluralize(resource_name) %>) do
+      # entity attributes
+      primary_key :id
+    end
+  end
+end

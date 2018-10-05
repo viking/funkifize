@@ -30,6 +30,24 @@ module Funkifize
         template("repository.rb", File.join("lib", app_name, "repositories", "#{repository_name}.rb"), @repository_options)
       end
 
+      def create_migration_file
+        dir = File.join("db", "migrate")
+        empty_directory(dir, @repository_options)
+
+        # calculate migration version
+        last_version = Dir.glob("*.rb", base: dir).inject(0) do |ver, fn|
+          md = fn.match(/^(\d+)/)
+          if md
+            [ver, md[1].to_i].max
+          else
+            ver
+          end
+        end
+
+        filename = "%03d_create_%s.rb" % [last_version + 1, pluralize(resource_name)]
+        template("migration.rb", File.join(dir, filename), @repository_options)
+      end
+
       def add_autoload_instruction
         inside do
           target = File.join("lib", "#{app_name}.rb")

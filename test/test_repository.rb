@@ -22,15 +22,22 @@ class TestRepository < Minitest::Test
 
     assert_file_contains "lib/frobnitz.rb", /autoload :WidgetRepository/
 
+    assert File.exist?("db/migrate/001_create_widgets.rb")
+    assert_file_contains "db/migrate/001_create_widgets.rb", "create_table(:widgets)"
+
     assert_file_contains "lib/frobnitz/builder.rb",
       /def bootstrap\n((?!\s*end\b).*?\n)*?\s+injector\.register_service\('WidgetRepository', WidgetRepository\)\n/m
   end
 
   def test_create_with_dirty_app
     gsub_file "lib/frobnitz.rb", /^\s+# repositories$/, ""
+    touch_file "db/migrate/001_foo.rb"
 
     Funkifize::CLI.start(%w{repository create --quiet widget})
 
     assert_file_contains "lib/frobnitz.rb", /autoload :WidgetRepository/
+
+    assert File.exist?("db/migrate/002_create_widgets.rb")
+    assert_file_contains "db/migrate/002_create_widgets.rb", "create_table(:widgets)"
   end
 end
