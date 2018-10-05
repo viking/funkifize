@@ -1,0 +1,8 @@
+module CouplerAPI
+  <%= resource_constant %> = Entity([
+    # attributes
+    :id,
+  ]) do
+    # additional instance/class methods
+  end
+end

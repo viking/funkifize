@@ -13,5 +13,8 @@ module Funkifize
 
     desc "repository SUBCOMMAND ...ARGS", "Manage repositories"
     subcommand "repository", Repository
+
+    desc "entity SUBCOMMAND ...ARGS", "Manage entities"
+    subcommand "entity", Entity
   end
 end

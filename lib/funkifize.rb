@@ -8,6 +8,7 @@ module Funkifize
   autoload :Router, "funkifize/router"
   autoload :Controller, "funkifize/controller"
   autoload :Repository, "funkifize/repository"
+  autoload :Entity, "funkifize/entity"
   autoload :Helpers, "funkifize/helpers"
   autoload :Actions, "funkifize/actions"
 end
