@@ -1,4 +1,5 @@
 require "thor"
+require "active_support/inflector"
 
 module Funkifize
   autoload :VERSION, "funkifize/version"

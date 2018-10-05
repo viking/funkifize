@@ -71,7 +71,7 @@ module Funkifize
             (\1\ \ \ \ .*?\n)*
             (?=\1\ \ \])
           }xm
-          rplmnt = "\\1    { path: %r{^/#{resource_name}s(?=/)?}, router: #{router_name} },\n"
+          rplmnt = "\\1    { path: %r{^/#{pluralize(resource_name)}(?=/)?}, router: #{router_name} },\n"
           inject_into_file(target, rplmnt, @router_options.merge(after: pattern))
         end
       end

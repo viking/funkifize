@@ -38,5 +38,9 @@ module Funkifize
     def add_class_dependency(filename, class_name, dependency_name, dependency_constant, config = {})
       action Actions::AddClassDependency.new(self, filename, class_name, dependency_name, dependency_constant, config)
     end
+
+    def pluralize(word)
+      ActiveSupport::Inflector.pluralize(word)
+    end
   end
 end
