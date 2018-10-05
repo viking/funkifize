@@ -7,4 +7,5 @@ module Funkifize
   autoload :Router, "funkifize/router"
   autoload :Controller, "funkifize/controller"
   autoload :Helpers, "funkifize/helpers"
+  autoload :Actions, "funkifize/actions"
 end
