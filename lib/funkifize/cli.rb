@@ -10,5 +10,8 @@ module Funkifize
 
     desc "controller SUBCOMMAND ...ARGS", "Manage controllers"
     subcommand "controller", Controller
+
+    desc "repository SUBCOMMAND ...ARGS", "Manage repositories"
+    subcommand "repository", Repository
   end
 end

@@ -1,0 +1,17 @@
+module <%= app_constant %>
+  class <%= repository_constant %> < Repository
+    def initialize(*args)
+      super
+      @name = :<%= pluralize(resource_name) %>
+      @constructor = <%= resource_constant %>
+    end
+
+    def serialize(hash)
+      hash
+    end
+
+    def unserialize(hash)
+      hash
+    end
+  end
+end
