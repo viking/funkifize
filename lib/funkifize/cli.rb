@@ -3,18 +3,18 @@ module Funkifize
     class_option :root, :type => :string
 
     desc "app SUBCOMMAND ...ARGS", "Manage applications"
-    subcommand "app", App
+    subcommand "app", Commands::App
 
     desc "router SUBCOMMAND ...ARGS", "Manage routers"
-    subcommand "router", Router
+    subcommand "router", Commands::Router
 
     desc "controller SUBCOMMAND ...ARGS", "Manage controllers"
-    subcommand "controller", Controller
+    subcommand "controller", Commands::Controller
 
     desc "repository SUBCOMMAND ...ARGS", "Manage repositories"
-    subcommand "repository", Repository
+    subcommand "repository", Commands::Repository
 
     desc "entity SUBCOMMAND ...ARGS", "Manage entities"
-    subcommand "entity", Entity
+    subcommand "entity", Commands::Entity
   end
 end
