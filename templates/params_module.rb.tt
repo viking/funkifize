@@ -1,0 +1,4 @@
+module <%= app_constant %>
+  module <%= params_module_constant %>
+  end
+end

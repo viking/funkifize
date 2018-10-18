@@ -5,5 +5,6 @@ module Funkifize
     autoload :Controller, "funkifize/commands/controller"
     autoload :Repository, "funkifize/commands/repository"
     autoload :Entity, "funkifize/commands/entity"
+    autoload :Params, "funkifize/commands/params"
   end
 end

@@ -1,0 +1,33 @@
+module <%= app_constant %>
+  module <%= params_module_constant %>
+    class <%= params_constant %>
+      VALID_KEYS = %w{}
+
+      def self.dependencies
+        []
+      end
+
+      def process(data)
+        if !data.is_a?(Hash)
+          raise ArgumentError, "expected argument to be a Hash"
+        end
+
+        result = {}
+        data.each_pair do |key, value|
+          if VALID_KEYS.include?(key)
+            # convert data types if needed:
+            #   case key
+            #   when "foo"
+            #     if value =~ /^\d+$/
+            #       value = value.to_i
+            #     end
+            #   end
+            #
+            result[key.to_sym] = value
+          end
+        end
+        result
+      end
+    end
+  end
+end

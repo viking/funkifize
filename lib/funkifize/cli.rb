@@ -16,5 +16,8 @@ module Funkifize
 
     desc "entity SUBCOMMAND ...ARGS", "Manage entities"
     subcommand "entity", Commands::Entity
+
+    desc "params SUBCOMMAND ...ARGS", "Manage params"
+    subcommand "params", Commands::Params
   end
 end
