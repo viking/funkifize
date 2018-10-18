@@ -19,5 +19,8 @@ module Funkifize
 
     desc "params SUBCOMMAND ...ARGS", "Manage params"
     subcommand "params", Commands::Params
+
+    desc "validator SUBCOMMAND ...ARGS", "Manage validators"
+    subcommand "validator", Commands::Validator
   end
 end

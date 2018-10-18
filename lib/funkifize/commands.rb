@@ -6,5 +6,6 @@ module Funkifize
     autoload :Repository, "funkifize/commands/repository"
     autoload :Entity, "funkifize/commands/entity"
     autoload :Params, "funkifize/commands/params"
+    autoload :Validator, "funkifize/commands/validator"
   end
 end

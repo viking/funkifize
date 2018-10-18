@@ -1,0 +1,25 @@
+module <%= app_constant %>
+  module <%= validators_module_constant %>
+    class <%= validator_constant %>
+      def self.dependencies
+        []
+      end
+
+      def validate(data)
+        if !data.is_a?(Hash)
+          raise ArgumentError, "expected argument to be a Hash"
+        end
+
+        errors = []
+
+        # add data validation here:
+        #
+        #   if data[:foo].nil?
+        #     errors.push("foo must be present")
+        #   end
+
+        errors
+      end
+    end
+  end
+end
