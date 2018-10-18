@@ -20,7 +20,8 @@ class TestController < Minitest::Test
     Funkifize::CLI.start(%w{controller create --quiet widget})
     assert File.exist?("lib/frobnitz/controllers/widget_controller.rb")
 
-    assert_file_contains "lib/frobnitz.rb", /autoload :WidgetController/
+    assert_file_contains "lib/frobnitz.rb",
+      %r{# controllers\s+autoload :WidgetController, "frobnitz/controllers/widget_controller"}m
 
     assert_file_contains "lib/frobnitz/builder.rb",
       /def bootstrap\n((?!\s*end\b).*?\n)*?\s+injector\.register_service\('WidgetController', WidgetController\)\n/m

@@ -35,8 +35,8 @@ class Funkifize::Commands::Router < Thor
 
         # put line either after a block starting with "# routers" or just
         # before the end of the main app module
-        pattern = /^(\s*)module #{app_constant}.*\n(?:\s*# routers.*\n(?=\n)|(?=\1end\s*))/m
-        rplmnt = %{\1  autoload :#{router_constant}, "#{app_name}/routers/#{router_name}"\n}
+        pattern = /^(\s*)module #{app_constant}.*\n(?:\s*# routers.*?\n(?=\n)|(?=\1end\s*))/m
+        rplmnt = %{\\1  autoload :#{router_constant}, "#{app_name}/routers/#{router_name}"\n}
         inject_into_file(target, rplmnt, @router_options.merge(after: pattern))
       end
     end

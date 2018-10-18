@@ -33,8 +33,8 @@ class Funkifize::Commands::Entity < Thor
 
         # put line either after a block starting with "# entities" or just
         # before the end of the main app module
-        pattern = /^(\s*)module #{app_constant}.*\n(?:\s*# entities.*\n(?=\n)|(?=\1end\s*))/m
-        rplmnt = %{\1  autoload :#{resource_constant}, "#{app_name}/entities/#{resource_name}"\n}
+        pattern = /^(\s*)module #{app_constant}.*\n(?:\s*# entities.*?\n(?=\n)|(?=\1end\s*))/m
+        rplmnt = %{\\1  autoload :#{resource_constant}, "#{app_name}/entities/#{resource_name}"\n}
         inject_into_file(target, rplmnt, @entity_options.merge(after: pattern))
       end
     end

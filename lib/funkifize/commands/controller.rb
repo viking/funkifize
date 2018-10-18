@@ -35,8 +35,8 @@ class Funkifize::Commands::Controller < Thor
 
         # put line either after a block starting with "# controllers" or just
         # before the end of the main app module
-        pattern = /^(\s*)module #{app_constant}.*\n(?:\s*# controllers.*\n(?=\n)|(?=\1end\s*))/m
-        rplmnt = %{\1  autoload :#{controller_constant}, "#{app_name}/controllers/#{controller_name}"\n}
+        pattern = /^(\s*)module #{app_constant}.*\n(?:\s*# controllers.*?\n(?=\n)|(?=\1end\s*))/m
+        rplmnt = %{\\1  autoload :#{controller_constant}, "#{app_name}/controllers/#{controller_name}"\n}
         inject_into_file(target, rplmnt, @controller_options.merge(after: pattern))
       end
     end

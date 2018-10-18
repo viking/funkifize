@@ -20,7 +20,8 @@ class TestEntity < Minitest::Test
     Funkifize::CLI.start(%w{entity create --quiet widget})
     assert File.exist?("lib/frobnitz/entities/widget.rb")
 
-    assert_file_contains "lib/frobnitz.rb", /autoload :Widget/
+    assert_file_contains "lib/frobnitz.rb",
+      %r{# entities\s+autoload :Widget, "frobnitz/entities/widget"}m
 
     assert_file_contains "lib/frobnitz/builder.rb",
       /def bootstrap\n((?!\s*end\b).*?\n)*?\s+injector\.register_service\('Widget', Widget\)\n/m

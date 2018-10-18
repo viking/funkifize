@@ -20,7 +20,8 @@ class TestRepository < Minitest::Test
     Funkifize::CLI.start(%w{repository create --quiet widget})
     assert File.exist?("lib/frobnitz/repositories/widget_repository.rb")
 
-    assert_file_contains "lib/frobnitz.rb", /autoload :WidgetRepository/
+    assert_file_contains "lib/frobnitz.rb",
+      %r{# repositories\s+autoload :WidgetRepository, "frobnitz/repositories/widget_repository"}m
 
     assert File.exist?("db/migrate/001_create_widgets.rb")
     assert_file_contains "db/migrate/001_create_widgets.rb", "create_table(:widgets)"
