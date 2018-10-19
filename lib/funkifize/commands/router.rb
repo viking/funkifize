@@ -55,7 +55,7 @@ class Funkifize::Commands::Router < Thor
     def add_application_dependency
       inside do
         target = File.join("lib", app_name, "application.rb")
-        add_class_dependency(target, "Application", router_name, router_constant)
+        add_class_dependency(target, "Application", router_name, router_constant, instance_vars: false)
       end
     end
 

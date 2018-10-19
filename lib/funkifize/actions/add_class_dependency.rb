@@ -71,6 +71,10 @@ module Funkifize
           return
         end
 
+        if !@config.has_key?(:instance_vars) || @config[:instance_vars]
+          @content.insert(md.begin(3), "#{md[1]}    @#{dependency_name} = #{dependency_name}\n")
+        end
+
         if md[2] == ""
           # no parameters yet
           @content.insert(md.begin(2), "(#{dependency_name})")

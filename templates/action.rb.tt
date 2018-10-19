@@ -1,0 +1,24 @@
+module <%= app_constant %>
+  module <%= actions_module_constant %>
+    class <%= action_constant %>
+      def initialize(repo, validator)
+        @repo = repo
+        @validator = validator
+      end
+
+      def self.dependencies
+        ['<%= resource_constant %>Repository', '<%= resource_constant %>Validators::<%= action_constant %>']
+      end
+
+      def run(params)
+        errors = @validator.validate(params)
+        if errors.empty?
+          # do things
+          { 'success' => true }
+        else
+          { 'errors' => errors }
+        end
+      end
+    end
+  end
+end

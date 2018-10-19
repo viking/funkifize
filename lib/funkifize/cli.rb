@@ -22,5 +22,8 @@ module Funkifize
 
     desc "validator SUBCOMMAND ...ARGS", "Manage validators"
     subcommand "validator", Commands::Validator
+
+    desc "usecase SUBCOMMAND ...ARGS", "Manage use cases (actions)"
+    subcommand "usecase", Commands::Usecase
   end
 end

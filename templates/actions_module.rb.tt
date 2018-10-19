@@ -1,0 +1,4 @@
+module <%= app_constant %>
+  module <%= actions_module_constant %>
+  end
+end
