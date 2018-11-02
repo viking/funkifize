@@ -7,9 +7,6 @@ class TestRepository < Minitest::Test
     @tmpdir = Dir.mktmpdir
     @pwd = Dir.pwd
     Dir.chdir(@tmpdir)
-
-    Funkifize::CLI.start(%w{app create --quiet frobnitz})
-    Dir.chdir("frobnitz")
   end
 
   def teardown
@@ -17,6 +14,8 @@ class TestRepository < Minitest::Test
   end
 
   def test_create
+    setup_app
+
     Funkifize::CLI.start(%w{repository create --quiet widget})
     assert File.exist?("lib/frobnitz/repositories/widget_repository.rb")
 
@@ -31,6 +30,8 @@ class TestRepository < Minitest::Test
   end
 
   def test_create_with_dirty_app
+    setup_app
+
     gsub_file "lib/frobnitz.rb", /^\s+# repositories$/, ""
     touch_file "db/migrate/001_foo.rb"
 
@@ -40,5 +41,14 @@ class TestRepository < Minitest::Test
 
     assert File.exist?("db/migrate/002_create_widgets.rb")
     assert_file_contains "db/migrate/002_create_widgets.rb", "create_table(:widgets)"
+  end
+
+  def test_create_with_custom_app_constant
+    setup_app(%w{--app-constant=FrObNiTz})
+
+    Funkifize::CLI.start(%w{repository create --quiet --app-constant=FrObNiTz widget})
+
+    assert_file_contains "lib/frobnitz.rb",
+      %r{module FrObNiTz.+autoload :WidgetRepository, "frobnitz/repositories/widget_repository"}m
   end
 end

@@ -7,7 +7,7 @@ require "<%= app_name %>/version"
 
 Gem::Specification.new do |spec|
   spec.name          = <%= app_name.inspect %>
-  spec.version       = <%= constant_name %>::VERSION
+  spec.version       = <%= app_constant %>::VERSION
   spec.authors       = [<%= author.inspect %>]
   spec.email         = [<%= email.inspect %>]
 

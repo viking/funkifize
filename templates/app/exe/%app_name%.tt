@@ -1,4 +1,4 @@
 #!/usr/bin/env ruby
 require "<%= app_name %>"
 
-<%= constant_name %>::CLI.start(ARGV)
+<%= app_constant %>::CLI.start(ARGV)

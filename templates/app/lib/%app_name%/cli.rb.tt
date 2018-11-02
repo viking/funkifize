@@ -1,4 +1,4 @@
-module <%= constant_name %>
+module <%= app_constant %>
   class CLI < Thor
     desc "start", "Run <%= app_name %>"
     option :server, :type => :string, :default => 'webrick', :desc => "HTTP server to use"

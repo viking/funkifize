@@ -67,5 +67,5 @@ class Funkifize::Commands::Usecase < Thor
     end
   end
 
-  register Funkifize::Commands::Usecase::Create, "create", "create ACTION_NAME", "Create action named ACTION_NAME"
+  register Funkifize::Commands::Usecase::Create, "create", "create RESOURCE_NAME ACTION_NAME", "Create action named ACTION_NAME"
 end

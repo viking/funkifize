@@ -5,7 +5,7 @@ require "rack/cors"
 require "hashery"
 require "sequel"
 
-module <%= constant_name %>
+module <%= app_constant %>
   autoload :VERSION, "<%= app_name %>/version"
 
   # base classes

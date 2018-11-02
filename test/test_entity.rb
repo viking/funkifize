@@ -7,9 +7,6 @@ class TestEntity < Minitest::Test
     @tmpdir = Dir.mktmpdir
     @pwd = Dir.pwd
     Dir.chdir(@tmpdir)
-
-    Funkifize::CLI.start(%w{app create --quiet frobnitz})
-    Dir.chdir("frobnitz")
   end
 
   def teardown
@@ -17,6 +14,8 @@ class TestEntity < Minitest::Test
   end
 
   def test_create
+    setup_app
+
     Funkifize::CLI.start(%w{entity create --quiet widget})
     assert File.exist?("lib/frobnitz/entities/widget.rb")
 
@@ -28,10 +27,21 @@ class TestEntity < Minitest::Test
   end
 
   def test_create_with_dirty_app
+    setup_app
+
     gsub_file "lib/frobnitz.rb", /^\s+# entities$/, ""
 
     Funkifize::CLI.start(%w{entity create --quiet widget})
 
     assert_file_contains "lib/frobnitz.rb", /autoload :Widget/
+  end
+
+  def test_create_with_custom_app_constant
+    setup_app(%w{--app-constant=FrObNiTz})
+
+    Funkifize::CLI.start(%w{entity create --quiet --app-constant=FrObNiTz widget})
+
+    assert_file_contains "lib/frobnitz.rb",
+      %r{module FrObNiTz.+autoload :Widget, "frobnitz/entities/widget"}m
   end
 end

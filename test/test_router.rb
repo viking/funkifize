@@ -7,9 +7,6 @@ class TestRouter < Minitest::Test
     @tmpdir = Dir.mktmpdir
     @pwd = Dir.pwd
     Dir.chdir(@tmpdir)
-
-    Funkifize::CLI.start(%w{app create --quiet frobnitz})
-    Dir.chdir("frobnitz")
   end
 
   def teardown
@@ -17,6 +14,8 @@ class TestRouter < Minitest::Test
   end
 
   def test_create
+    setup_app
+
     Funkifize::CLI.start(%w{router create --quiet widget})
     assert File.exist?("lib/frobnitz/routers/widget_router.rb")
 
@@ -35,6 +34,8 @@ class TestRouter < Minitest::Test
   end
 
   def test_create_with_dirty_app
+    setup_app
+
     gsub_file "lib/frobnitz.rb", /^\s+# routers$/, ""
 
     gsub_file "lib/frobnitz/application.rb",
@@ -53,5 +54,14 @@ class TestRouter < Minitest::Test
       /def initialize\(blah, widget_router\)/
     assert_file_contains "lib/frobnitz/application.rb",
       "{ path: %r{^/widgets(?=/)?}, router: widget_router }"
+  end
+
+  def test_create_with_custom_app_constant
+    setup_app(%w{--app-constant=FrObNiTz})
+
+    Funkifize::CLI.start(%w{router create --quiet --app-constant=FrObNiTz widget})
+
+    assert_file_contains "lib/frobnitz.rb",
+      %r{module FrObNiTz.+autoload :WidgetRouter, "frobnitz/routers/widget_router"}m
   end
 end

@@ -7,10 +7,6 @@ class TestUsecase < Minitest::Test
     @tmpdir = Dir.mktmpdir
     @pwd = Dir.pwd
     Dir.chdir(@tmpdir)
-
-    Funkifize::CLI.start(%w{app create --quiet frobnitz})
-    Dir.chdir("frobnitz")
-    Funkifize::CLI.start(%w{controller create --quiet widget})
   end
 
   def teardown
@@ -18,6 +14,9 @@ class TestUsecase < Minitest::Test
   end
 
   def test_create
+    setup_app
+    Funkifize::CLI.start(%w{controller create --quiet widget})
+
     Funkifize::CLI.start(%w{usecase create --quiet widget create})
 
     assert_file_contains "lib/frobnitz.rb",
@@ -47,5 +46,15 @@ class TestUsecase < Minitest::Test
   end
 
   def test_create_dirty
+  end
+
+  def test_create_with_custom_app_constant
+    setup_app(%w{--app-constant=FrObNiTz})
+    Funkifize::CLI.start(%w{controller create --quiet widget})
+
+    Funkifize::CLI.start(%w{usecase create --quiet --app-constant=FrObNiTz widget create})
+
+    assert_file_contains "lib/frobnitz.rb",
+      %r{module FrObNiTz.+autoload :Widgets, "frobnitz/actions/widgets"}m
   end
 end

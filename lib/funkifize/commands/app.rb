@@ -1,7 +1,7 @@
 class Funkifize::Commands::App < Thor
   class Create < Thor::Group
     include Thor::Actions
-    attr_reader :constant_name, :author, :email, :github_username
+    attr_reader :app_constant, :author, :email, :github_username
 
     add_runtime_options!
     argument :app_name, :desc => "Application name"
@@ -17,7 +17,11 @@ class Funkifize::Commands::App < Thor
 
     def setup
       @app_options = { verbose: !options[:quiet] }
-      @constant_name = app_name.gsub(/(?:[_-]+|^)(.)/) { $1.upcase }
+      if options[:app_constant]
+        @app_constant = options[:app_constant]
+      else
+        @app_constant = app_name.gsub(/(?:[_-]+|^)(.)/) { $1.upcase }
+      end
 
       git_author_name = `git config user.name`.chomp rescue ""
       @author = git_author_name.empty? ? "TODO: Write your name" : git_author_name

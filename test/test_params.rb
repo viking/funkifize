@@ -7,9 +7,6 @@ class TestParams < Minitest::Test
     @tmpdir = Dir.mktmpdir
     @pwd = Dir.pwd
     Dir.chdir(@tmpdir)
-
-    Funkifize::CLI.start(%w{app create --quiet frobnitz})
-    Dir.chdir("frobnitz")
   end
 
   def teardown
@@ -17,6 +14,8 @@ class TestParams < Minitest::Test
   end
 
   def test_create
+    setup_app
+
     Funkifize::CLI.start(%w{params create --quiet widget create})
 
     assert_file_contains "lib/frobnitz.rb",
@@ -30,5 +29,14 @@ class TestParams < Minitest::Test
   end
 
   def test_create_dirty
+  end
+
+  def test_create_with_custom_app_constant
+    setup_app(%w{--app-constant=FrObNiTz})
+
+    Funkifize::CLI.start(%w{params create --quiet --app-constant=FrObNiTz widget create})
+
+    assert_file_contains "lib/frobnitz.rb",
+      %r{module FrObNiTz.+autoload :WidgetParams, "frobnitz/params/widget_params"}m
   end
 end

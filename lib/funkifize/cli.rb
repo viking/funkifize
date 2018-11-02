@@ -1,6 +1,8 @@
 module Funkifize
   class CLI < Thor
     class_option :root, :type => :string
+    class_option :app_name, :type => :string
+    class_option :app_constant, :type => :string
 
     desc "app SUBCOMMAND ...ARGS", "Manage applications"
     subcommand "app", Commands::App

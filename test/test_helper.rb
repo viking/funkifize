@@ -6,6 +6,12 @@ require "fileutils"
 require "minitest/autorun"
 
 module TestHelpers
+  def setup_app(opts = [])
+    args = ["app", "create"] + opts + ["--quiet", "frobnitz"]
+    Funkifize::CLI.start(args)
+    Dir.chdir("frobnitz")
+  end
+
   def assert_file_contains(filename, pattern)
     data = File.read(filename)
     case pattern
