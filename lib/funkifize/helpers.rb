@@ -43,7 +43,16 @@ module Funkifize
         if options[:app_constant]
           @app_constant = options[:app_constant]
         else
-          @app_constant = make_constant_name(app_name)
+          inside do
+            # try to get app constant from gemspec
+            gemspec = File.read("#{app_name}.gemspec")
+            md = gemspec.match(/spec\.version[ \t]*=\s+(\w+)::VERSION/)
+            if md
+              @app_constant = md[1]
+            else
+              @app_constant = make_constant_name(app_name)
+            end
+          end
         end
       end
       @app_constant

@@ -44,4 +44,13 @@ class TestController < Minitest::Test
     assert_file_contains "lib/frobnitz.rb",
       %r{module FrObNiTz.+autoload :WidgetController, "frobnitz/controllers/widget_controller"}m
   end
+
+  def test_create_with_auto_custom_app_constant
+    setup_app(%w{--app-constant=FrObNiTz})
+
+    Funkifize::CLI.start(%w{controller create --quiet widget})
+
+    assert_file_contains "lib/frobnitz.rb",
+      %r{module FrObNiTz.+autoload :WidgetController, "frobnitz/controllers/widget_controller"}m
+  end
 end
