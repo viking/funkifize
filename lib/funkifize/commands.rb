@@ -7,6 +7,6 @@ module Funkifize
     autoload :Entity, "funkifize/commands/entity"
     autoload :Params, "funkifize/commands/params"
     autoload :Validator, "funkifize/commands/validator"
-    autoload :Usecase, "funkifize/commands/usecase"
+    autoload :Action, "funkifize/commands/action"
   end
 end

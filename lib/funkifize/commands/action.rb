@@ -1,17 +1,17 @@
 module Funkifize
   module Commands
-    class Usecase < Command
+    class Action < Command
       def run(argv = [])
         subcommand = argv.shift
         klass =
           case subcommand
-          when "create" then Usecase::Create
+          when "create" then Action::Create
           else
             nil
           end
 
         if klass.nil?
-          $stderr.puts "Usage: funkifize [opts] usecase <command> <args>"
+          $stderr.puts "Usage: funkifize [opts] action <command> <args>"
           $stderr.puts "Commands: create"
         else
           command = klass.new(options)

@@ -30,14 +30,14 @@ module Funkifize
         when "entity" then Commands::Entity
         when "params" then Commands::Params
         when "validator" then Commands::Validator
-        when "usecase" then Commands::Usecase
+        when "action" then Commands::Action
         else
           nil
         end
 
       if klass.nil?
         $stderr.puts "Usage: funkifize [opts] <command> <args>"
-        $stderr.puts "Commands: app, router, controller, repository, entity, params, validator, usecase"
+        $stderr.puts "Commands: app, router, controller, repository, entity, params, validator, action"
       else
         command = klass.new(options)
         command.run(argv)

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestUsecase < Minitest::Test
+class TestAction < Minitest::Test
   include TestHelpers
 
   def setup
@@ -17,7 +17,7 @@ class TestUsecase < Minitest::Test
     setup_app
     Funkifize::CLI.start(%w{controller create --quiet widget})
 
-    Funkifize::CLI.start(%w{usecase create --quiet widget create})
+    Funkifize::CLI.start(%w{action create --quiet widget create})
 
     assert_file_contains "lib/frobnitz.rb",
       %r{# actions\s+autoload :Widgets, "frobnitz/actions/widgets"}m
@@ -52,7 +52,7 @@ class TestUsecase < Minitest::Test
     setup_app(%w{--app-constant=FrObNiTz})
     Funkifize::CLI.start(%w{controller create --quiet widget})
 
-    Funkifize::CLI.start(%w{usecase create --quiet --app-constant=FrObNiTz widget create})
+    Funkifize::CLI.start(%w{action create --quiet --app-constant=FrObNiTz widget create})
 
     assert_file_contains "lib/frobnitz.rb",
       %r{module FrObNiTz.+autoload :Widgets, "frobnitz/actions/widgets"}m
