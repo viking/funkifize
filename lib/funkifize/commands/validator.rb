@@ -1,58 +1,81 @@
-class Funkifize::Commands::Validator < Thor
-  class Create < Thor::Group
-    include Thor::Actions
-    include Funkifize::Helpers
-    attr_reader :validators_module_name, :validators_module_constant, :validator_name,
-      :validator_constant
+module Funkifize
+  module Commands
+    class Validator < Command
+      def run(argv = [])
+        subcommand = argv.shift
+        klass =
+          case subcommand
+          when "create" then Validator::Create
+          else
+            nil
+          end
 
-    add_runtime_options!
-    argument :resource_name, :desc => "Name of resource to make a validator class for"
-    argument :action_name, :desc => "Name of action to create a validator class for"
+        if klass.nil?
+          $stderr.puts "Usage: funkifize [opts] validator <command> <args>"
+          $stderr.puts "Commands: create"
+        else
+          command = klass.new(options)
+          command.run(argv)
+        end
+      end
 
-    def self.source_root
-      File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "..", "templates"))
-    end
+      class Create < Command
+        include Funkifize::Helpers
 
-    def self.printable_commands(*args)
-      # don't print this command twice
-      []
-    end
+        attr_reader :resource_name, :action_name, :validators_module_name,
+          :validators_module_constant, :validator_name, :validator_constant
 
-    def setup
-      self.destination_root = options[:root] if options[:root]
-      @validator_options = { verbose: !options[:quiet] }
-      @validators_module_name = "#{resource_name}_validators"
-      @validators_module_constant = make_constant_name(@validators_module_name)
-      @validator_name = action_name
-      @validator_constant = make_constant_name(@validator_name)
-    end
+        def run(argv = [])
+          @resource_name = argv.shift
+          @action_name = argv.shift
 
-    def create_validators_module_file
-      empty_directory(File.join("lib", app_name, "validators"), @validator_options)
-      template("validators_module.rb", File.join("lib", app_name, "validators", "#{validators_module_name}.rb"), @validator_options.merge(skip: true))
-    end
+          if @resource_name.nil? || @action_name.nil?
+            $stderr.puts "Usage: funkifize [opts] validator create <name>"
+            return
+          end
 
-    def setup_autoload_for_validators_module
-      target = File.join("lib", "#{app_name}.rb")
+          setup
+          create_validators_module_file
+          setup_autoload_for_validators_module
+          create_validator_file
+          setup_autoload_for_validator_class
+        end
 
-      # put line either after a block starting with "# validator" or just
-      # before the end of the main app module
-      pattern = /^([ \t]*)module #{app_constant}.*?\n(?:\s*# validators.*?\n(?=\n)|(?=\1end\s*))/m
-      rplmnt = %{\\1  autoload :#{validators_module_constant}, "#{app_name}/validators/#{validators_module_name}"\n}
-      inject_into_file(target, rplmnt, @validator_options.merge(after: pattern))
-    end
+        def setup
+          self.destination_root = options[:root] if options[:root]
+          @validators_module_name = "#{resource_name}_validators"
+          @validators_module_constant = make_constant_name(@validators_module_name)
+          @validator_name = action_name
+          @validator_constant = make_constant_name(@validator_name)
+        end
 
-    def create_validator_file
-      empty_directory(File.join("lib", app_name, "validators", validators_module_name), @validator_options)
-      template("validator.rb", File.join("lib", app_name, "validators", validators_module_name, "#{validator_name}.rb"), @validator_options)
-    end
+        def create_validators_module_file
+          empty_directory(File.join("lib", app_name, "validators"))
+          template("validators_module.rb", File.join("lib", app_name, "validators", "#{validators_module_name}.rb"))
+        end
 
-    def setup_autoload_for_validator_class
-      inject_into_module(File.join("lib", app_name, "validators", "#{validators_module_name}.rb"), validators_module_constant, @validator_options) do
-        %{    autoload :#{validator_constant}, "#{app_name}/validators/#{validators_module_name}/#{validator_name}"\n}
+        def setup_autoload_for_validators_module
+          target = File.join("lib", "#{app_name}.rb")
+
+          # put line either after a block starting with "# validator" or just
+          # before the end of the main app module
+          pattern = /^([ \t]*)module #{app_constant}.*?\n(?:\s*# validators.*?\n(?=\n)|(?=\1end\s*))/m
+          rplmnt = %{\\1  autoload :#{validators_module_constant}, "#{app_name}/validators/#{validators_module_name}"\n}
+          inject_into_file(target, rplmnt, pattern)
+        end
+
+        def create_validator_file
+          empty_directory(File.join("lib", app_name, "validators", validators_module_name))
+          template("validator.rb", File.join("lib", app_name, "validators", validators_module_name, "#{validator_name}.rb"))
+        end
+
+        def setup_autoload_for_validator_class
+          target = File.join("lib", app_name, "validators", "#{validators_module_name}.rb")
+          pattern = /^(\s*)module #{validators_module_constant}\n/m
+          rplmnt = %{\\1  autoload :#{validator_constant}, "#{app_name}/validators/#{validators_module_name}/#{validator_name}"\n}
+          inject_into_file(target, rplmnt, pattern)
+        end
       end
     end
   end
-
-  register Funkifize::Commands::Validator::Create, "create", "create RESOURCE_NAME ACTION_NAME", "Create validator for specified resource and action"
 end

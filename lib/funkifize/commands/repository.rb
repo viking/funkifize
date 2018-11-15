@@ -1,75 +1,93 @@
-class Funkifize::Commands::Repository < Thor
-  class Create < Thor::Group
-    include Thor::Actions
-    include Funkifize::Helpers
-    attr_reader :resource_constant, :repository_name, :repository_constant
+module Funkifize
+  module Commands
+    class Repository < Command
+      def run(argv = [])
+        subcommand = argv.shift
+        klass =
+          case subcommand
+          when "create" then Repository::Create
+          else
+            nil
+          end
 
-    add_runtime_options!
-    argument :resource_name, :desc => "Name of resource to make a repository for"
-
-    def self.source_root
-      File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "..", "templates"))
-    end
-
-    def self.printable_commands(*args)
-      # don't print this command twice
-      []
-    end
-
-    def setup
-      self.destination_root = options[:root] if options[:root]
-      @repository_options = { verbose: !options[:quiet] }
-      @resource_constant = make_constant_name(resource_name)
-      @repository_name = "#{resource_name}_repository"
-      @repository_constant = make_constant_name(@repository_name)
-    end
-
-    def create_repository_file
-      empty_directory(File.join("lib", app_name, "repositories"), @repository_options)
-      template("repository.rb", File.join("lib", app_name, "repositories", "#{repository_name}.rb"), @repository_options)
-    end
-
-    def create_migration_file
-      dir = File.join("db", "migrate")
-      empty_directory(dir, @repository_options)
-
-      # calculate migration version
-      last_version = Dir.glob("*.rb", base: dir).inject(0) do |ver, fn|
-        md = fn.match(/^(\d+)/)
-        if md
-          [ver, md[1].to_i].max
+        if klass.nil?
+          $stderr.puts "Usage: funkifize [opts] repository <command> <args>"
+          $stderr.puts "Commands: create"
         else
-          ver
+          command = klass.new(options)
+          command.run(argv)
         end
       end
 
-      filename = "%03d_create_%s.rb" % [last_version + 1, pluralize(resource_name)]
-      template("migration.rb", File.join(dir, filename), @repository_options)
-    end
+      class Create < Command
+        include Funkifize::Helpers
+        attr_reader :resource_name, :resource_constant, :repository_name,
+          :repository_constant
 
-    def add_autoload_instruction
-      inside do
-        target = File.join("lib", "#{app_name}.rb")
+        def run(argv = [])
+          @resource_name = argv.shift
 
-        # put line either after a block starting with "# repositories" or just
-        # before the end of the main app module
-        pattern = /^(\s*)module #{app_constant}.*\n(?:\s*# repositories.*?\n(?=\n)|(?=\1end\s*))/m
-        rplmnt = %{\\1  autoload :#{repository_constant}, "#{app_name}/repositories/#{repository_name}"\n}
-        inject_into_file(target, rplmnt, @repository_options.merge(after: pattern))
-      end
-    end
+          if @resource_name.nil?
+            $stderr.puts "Usage: funkifize [opts] repository create <name>"
+            return
+          end
 
-    def setup_injector
-      inside do
-        target = File.join("lib", app_name, "builder.rb")
+          setup
+          create_repository_file
+          create_migration_file
+          add_autoload_instruction
+          setup_injector
+        end
 
-        # put line # just before the end of the bootstrap function
-        pattern = /^([ \t]*)def bootstrap.*?(?=^\1end\b)/m
-        rplmnt = %{\\1  injector.register_service('#{repository_constant}', #{repository_constant})\n}
-        inject_into_file(target, rplmnt, @repository_options.merge(after: pattern))
+        def setup
+          self.destination_root = options[:root] if options[:root]
+          @resource_constant = make_constant_name(resource_name)
+          @repository_name = "#{resource_name}_repository"
+          @repository_constant = make_constant_name(@repository_name)
+        end
+
+        def create_repository_file
+          empty_directory(File.join("lib", app_name, "repositories"))
+          template("repository.rb", File.join("lib", app_name, "repositories", "#{repository_name}.rb"))
+        end
+
+        def create_migration_file
+          dir = File.join("db", "migrate")
+          empty_directory(dir)
+
+          # calculate migration version
+          last_version = Dir.glob("*.rb", base: dir).inject(0) do |ver, fn|
+            md = fn.match(/^(\d+)/)
+            if md
+              [ver, md[1].to_i].max
+            else
+              ver
+            end
+          end
+
+          filename = "%03d_create_%s.rb" % [last_version + 1, pluralize(resource_name)]
+          template("migration.rb", File.join(dir, filename))
+        end
+
+        def add_autoload_instruction
+          target = File.join("lib", "#{app_name}.rb")
+
+          # put line either after a block starting with "# repositories" or just
+          # before the end of the main app module
+          pattern = /^(\s*)module #{app_constant}.*\n(?:\s*# repositories.*?\n(?=\n)|(?=\1end\s*))/m
+          rplmnt = %{\\1  autoload :#{repository_constant}, "#{app_name}/repositories/#{repository_name}"\n}
+          inject_into_file(target, rplmnt, pattern)
+        end
+
+        def setup_injector
+          target = File.join("lib", app_name, "builder.rb")
+
+          # put line # just before the end of the bootstrap function
+          pattern = /^([ \t]*)def bootstrap.*?(?=^\1end\b)/m
+          rplmnt = %{\\1  injector.register_service('#{repository_constant}', #{repository_constant})\n}
+          inject_into_file(target, rplmnt, pattern)
+        end
       end
     end
   end
-
-  register Funkifize::Commands::Repository::Create, "create", "create REPOSITORY_NAME", "Create repository named REPOSITORY_NAME"
 end

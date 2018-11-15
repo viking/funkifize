@@ -4,6 +4,14 @@ module Funkifize
       name.gsub(/(?:[_-]+|^)(.|$)/) { $1.upcase }
     end
 
+    def inside(&block)
+      if destination_root
+        Dir.chdir(destination_root, &block)
+      else
+        block.call
+      end
+    end
+
     def app_name
       unless defined? @app_name
         inside do
@@ -56,10 +64,6 @@ module Funkifize
         end
       end
       @app_constant
-    end
-
-    def add_class_dependency(filename, class_name, dependency_name, dependency_constant, config = {})
-      action Actions::AddClassDependency.new(self, filename, class_name, dependency_name, dependency_constant, config)
     end
 
     def pluralize(word)

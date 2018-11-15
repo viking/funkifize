@@ -1,41 +1,59 @@
-class Funkifize::Commands::App < Thor
-  class Create < Thor::Group
-    include Thor::Actions
-    attr_reader :app_constant, :author, :email, :github_username
+module Funkifize
+  module Commands
+    class App < Command
+      def run(argv = [])
+        subcommand = argv.shift
+        klass =
+          case subcommand
+          when "create" then App::Create
+          else
+            nil
+          end
 
-    add_runtime_options!
-    argument :app_name, :desc => "Application name"
-
-    def self.source_root
-      File.expand_path(File.join(File.dirname(__FILE__), "..", "..", "..", "templates"))
-    end
-
-    def self.printable_commands(*args)
-      # don't print this command twice
-      []
-    end
-
-    def setup
-      @app_options = { verbose: !options[:quiet] }
-      if options[:app_constant]
-        @app_constant = options[:app_constant]
-      else
-        @app_constant = app_name.gsub(/(?:[_-]+|^)(.)/) { $1.upcase }
+        if klass.nil?
+          $stderr.puts "Usage: funkifize [opts] app <command> <args>"
+          $stderr.puts "Commands: create"
+        else
+          command = klass.new(options)
+          command.run(argv)
+        end
       end
 
-      git_author_name = `git config user.name`.chomp rescue ""
-      @author = git_author_name.empty? ? "TODO: Write your name" : git_author_name
+      class Create < Command
+        attr_reader :app_name, :app_constant, :author, :email, :github_username
 
-      git_user_email = `git config user.email`.chomp rescue ""
-      @email = git_user_email.empty? ? "TODO: Write your email address" : git_user_email
+        def run(argv = [])
+          @app_name = argv.shift
 
-      @github_username = `git config github.user`.chomp rescue ""
-    end
+          if @app_name.nil?
+            $stderr.puts "Usage: funkifize [opts] app create <name>"
+            return
+          end
 
-    def create_directories
-      directory("app", app_name, @app_options)
+          setup
+          create_directories
+        end
+
+        def setup
+          if options[:app_constant]
+            @app_constant = options[:app_constant]
+          else
+            @app_constant = app_name.gsub(/(?:[_-]+|^)(.)/) { $1.upcase }
+          end
+
+          git_author_name = `git config user.name`.chomp rescue ""
+          @author = git_author_name.empty? ? "TODO: Write your name" : git_author_name
+
+          git_user_email = `git config user.email`.chomp rescue ""
+          @email = git_user_email.empty? ? "TODO: Write your email address" : git_user_email
+
+          @github_username = `git config github.user`.chomp rescue ""
+        end
+
+        def create_directories
+          directory("app", app_name)
+        end
+      end
     end
   end
-
-  register Funkifize::Commands::App::Create, "create", "create APP_NAME", "Create application named APP_NAME"
 end

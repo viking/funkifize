@@ -1,31 +1,47 @@
 module Funkifize
-  class CLI < Thor
-    class_option :root, :type => :string
-    class_option :app_name, :type => :string
-    class_option :app_constant, :type => :string
+  class CLI
+    def self.start(argv = ARGV)
+      options = {}
+      OptionParser.new do |opts|
+        opts.on("--root=ROOT", "Root directory of application") do |root|
+          options[:root] = root
+        end
 
-    desc "app SUBCOMMAND ...ARGS", "Manage applications"
-    subcommand "app", Commands::App
+        opts.on("--app-name=APP_NAME", "Name of application") do |app_name|
+          options[:app_name] = app_name
+        end
 
-    desc "router SUBCOMMAND ...ARGS", "Manage routers"
-    subcommand "router", Commands::Router
+        opts.on("--app-constant=APP_CONSTANT", "Primary module name of application") do |app_constant|
+          options[:app_constant] = app_constant
+        end
 
-    desc "controller SUBCOMMAND ...ARGS", "Manage controllers"
-    subcommand "controller", Commands::Controller
+        opts.on("--quiet", "Don't print status messages") do |quiet|
+          options[:quiet] = quiet
+        end
+      end.parse!(argv)
 
-    desc "repository SUBCOMMAND ...ARGS", "Manage repositories"
-    subcommand "repository", Commands::Repository
+      command_name = argv.shift
+      klass =
+        case command_name
+        when "app" then Commands::App
+        when "router" then Commands::Router
+        when "controller" then Commands::Controller
+        when "repository" then Commands::Repository
+        when "entity" then Commands::Entity
+        when "params" then Commands::Params
+        when "validator" then Commands::Validator
+        when "usecase" then Commands::Usecase
+        else
+          nil
+        end
 
-    desc "entity SUBCOMMAND ...ARGS", "Manage entities"
-    subcommand "entity", Commands::Entity
-
-    desc "params SUBCOMMAND ...ARGS", "Manage params"
-    subcommand "params", Commands::Params
-
-    desc "validator SUBCOMMAND ...ARGS", "Manage validators"
-    subcommand "validator", Commands::Validator
-
-    desc "usecase SUBCOMMAND ...ARGS", "Manage use cases (actions)"
-    subcommand "usecase", Commands::Usecase
+      if klass.nil?
+        $stderr.puts "Usage: funkifize [opts] <command> <args>"
+        $stderr.puts "Commands: app, router, controller, repository, entity, params, validator, usecase"
+      else
+        command = klass.new(options)
+        command.run(argv)
+      end
+    end
   end
 end
